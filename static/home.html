@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanjeeveni - AI Powered Therapy Companion</title>
+    <style>
+        :root {
+            --primary: #e31e5a;
+            --secondary: #4a90e2;
+            --dark-text: #2c3e50;
+            --light-text: #666;
+            --white: #ffffff;
+            --light-pink: #fff5f7;
+            --light-gray: #f8f9fa;
+            --success: #28a745;
+            --warning: #ffc107;
+            --error: #dc3545;
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Accessibility Improvements */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth; /* Added for smooth scrolling */
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+        }
+
+        /* Focus styles for better keyboard navigation */
+        a:focus, button:focus, input:focus {
+            outline: 3px solid var(--secondary);
+            outline-offset: 2px;
+        }
+
+        /* Skip to main content link for screen readers */
+        .skip-to-main {
+            position: absolute;
+            left: -9999px;
+            z-index: 999;
+            padding: 1em;
+            background-color: var(--white);
+            color: var(--dark-text);
+            text-decoration: none;
+        }
+
+        .skip-to-main:focus {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary: #ff0000;
+                --secondary: #0000ff;
+                --dark-text: #000000;
+                --light-text: #333333;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .container-fluid {
+            width: 100%;
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+        }
+
+        nav.nav-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            flex-wrap: wrap;
+            max-width: 100%;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            margin-right: 2rem;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-links li a {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 0.2rem;
+            white-space: nowrap;
+        }
+
+        .nav-links li a:hover {
+            color: var(--primary);
+        }
+
+        /* Mobile menu button */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-btn svg {
+            width: 24px;
+            height: 24px;
+            color: var(--dark-text);
+        }
+
+        /* Auth buttons and search styles */
+        .auth-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .search-container input {
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            width: 180px;
+        }
+
+        .search-container .search-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .search-container .search-btn:hover {
+            color: var(--primary);
+        }
+
+        .btn-login {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-login:hover {
+            background-color: #c01a4b;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 900px) {
+            .nav-links {
+                display: none;
+                width: 100%;
+                order: 3;
+                margin-top: 1rem;
+            }
+            
+            .nav-links.mobile-nav-active {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                order: 2;
+            }
+            
+            .auth-buttons {
+                margin-left: auto;
+                order: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .search-container {
+                display: none;
+            }
+            
+            .logo {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: var(--light-pink);
+            padding: 130px 0 60px;
+        }
+
+        .hero-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .hero-content {
+            width: 50%;
+            padding-right: 30px;
+        }
+
+        .hero-image {
+            width: 50%;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero h1 {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--dark-text);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 24px; /* Increased font size */
+            margin-bottom: 30px;
+            color: var(--light-text);
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .hero .btn {
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.9s;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 40px;
+            color: var(--dark-text);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            font-size: 22px; /* Increased font size */
+            color: var(--light-text);
+            max-width: 700px;
+            margin: 0 auto;
+            margin-bottom: 15px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--dark-text);
+        }
+
+        .feature-card p {
+            color: var(--light-text);
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 0;
+            background-color: var(--light-pink);
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .step {
+            text-align: center;
+            width: 30%;
+        }
+
+        .step-number {
+            background-color: var(--primary);
+            color: var(--white);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .step h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .step p {
+            color: var(--light-text);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 80px 0;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .testimonial {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--light-text);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .testimonial-author img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .author-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .author-name {
+            font-weight: bold;
+            color: var(--dark-text);
+        }
+
+        .author-title {
+            font-size: 14px;
+            color: var(--light-text);
+        }
+
+        /* Signup Form */
+        .signup-section { /* Added ID for scrolling */
+            background-color: var(--white);
+            padding: 80px 0;
+        }
+
+        .signup-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--light-pink);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .signup-content {
+            width: 50%;
+            padding: 50px;
+        }
+
+        .signup-form {
+            width: 50%;
+            padding: 50px;
+            background-color: var(--white);
+        }
+
+        .signup-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .signup-content p {
+            margin-bottom: 20px;
+            color: var(--light-text);
+        }
+
+        .form-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .auth-toggle {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+        
+        .auth-toggle-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--light-gray);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--light-text);
+            transition: all 0.3s ease;
+        }
+        
+        .auth-toggle-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .form-submit:hover {
+            background: #d81557;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            border: none;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: 2px solid var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--gray-700);
+            border: 2px solid var(--gray-700);
+            color: white;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--gray-800);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark-text);
+            color: var(--white);
+            padding: 60px 0 20px;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            color: var(--white);
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: inline-block;
+            padding: 5px 0;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .footer-col p {
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 40px;
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Crisis Support Banner */
+        .crisis-support {
+            background-color: var(--error);
+            color: var(--white);
+            padding: 10px 0;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .crisis-support a {
+            color: var(--white);
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .crisis-support a:hover {
+            color: var(--light-pink);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-container {
+                flex-direction: column;
+            }
+
+            .hero-content, .hero-image {
+                width: 100%;
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+
+            .signup-container {
+                flex-direction: column;
+            }
+
+            .signup-content, .signup-form {
+                width: 100%;
+            }
+
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .features-grid, .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .step {
+                width: 100%;
+                margin-bottom: 40px;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Pricing Section */
+        .pricing {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .pricing-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
+        }
+        .pricing-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .pricing-card p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .pricing-card {
+            position: relative;
+        }
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .pricing-features li {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .pricing-card.recommended {
+            border: 2px solid var(--primary);
+            background-color: var(--light-pink);
+            transform: translateY(-5px);
+        }
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to main content link -->
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+    <!-- Crisis Support Banner -->
+    <div class="crisis-support" role="alert">
+        <p>If you're experiencing a mental health emergency, please call <a href="tel:112">112</a> (national emergency helpline) or contact the iCall mental health helpline at <a href="tel:+91-9152987821">+91-9152987821</a>. You are not alone.</p>
+    </div>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container-fluid">
+            <nav class="nav-flex">
+                <a href="#" class="logo">Sanjeeveni</a>
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <ul class="nav-links" id="mainNav">
+                    <li><a href="#how-it-works">How it works</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                </ul>
+                <div class="auth-buttons">
+                    <div class="search-container">
+                        <input type="text" placeholder="Find a therapist">
+                        <button type="button" class="search-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <a href="#auth-card" class="btn-login">Login / Sign Up</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <h1>Welcome to <span>Sanjeeveni</span></h1>
+                    <p>A safe space to heal, grow, and be heard anytime. Our AI-powered therapy companion is here to support your mental wellbeing journey.</p>
+                    <a href="#auth-card" class="btn btn-primary">Get Started</a>
+                    <button class="btn btn-outline" style="margin-left: 10px;">Learn More</button>
+                </div>
+                <div class="hero-image">
+                    <img src="8426451_3918491-removebg-preview.png" alt="Therapy session illustration">
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Why Choose Sanjeeveni</h2>
+                    <p>Our AI therapy companion offers unique benefits to support your mental health journey</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Complete Privacy</h3>
+                        <p>Your conversations are 100% private and secure. We prioritize your confidentiality above all else.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⏰</div>
+                        <h3>24/7 Availability</h3>
+                        <p>Get support whenever you need it, day or night. Sanjeeveni is always there to listen.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>Affordable Support</h3>
+                        <p>Access quality mental health support at a fraction of the cost of traditional therapy.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>AI-Powered Insights</h3>
+                        <p>Our advanced AI understands your patterns and provides personalized guidance.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌱</div>
+                        <h3>Growth Tracking</h3>
+                        <p>Monitor your progress and celebrate milestones on your mental health journey.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3>Human Backup</h3>
+                        <p>Connect with real therapists when needed, combining AI efficiency with human expertise.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <div class="section-title">
+                    <h2>How Sanjeeveni Works</h2>
+                    <p>Getting started with our AI therapy companion is simple and straightforward</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Sign Up</h3>
+                        <p>Create your account in minutes and tell us a bit about yourself so we can personalize your experience.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Connect & Share</h3>
+                        <p>Start chatting with Sanjeeveni and share your thoughts, concerns, or feelings in a safe space.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Grow & Heal</h3>
+                        <p>Receive personalized insights, coping strategies, and support as you progress on your journey.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="testimonials">
+            <div class="container">
+                <div class="section-title">
+                    <h2>What Our Users Say</h2>
+                    <p>Hear from people whose lives have been positively impacted by Sanjeeveni</p>
+                </div>
+                <div class="testimonial-grid">
+                    <div class="testimonial">
+                        <p class="testimonial-text">"Sanjeeveni has been a life-changing companion during my anxiety struggles. Having someone to talk to at 3 AM when I couldn't sleep made all the difference."</p>
+                        <div class="testimonial-author">
+                            <img src="/api/placeholder/50/50" alt="User avatar">
+                            <div class="author-info">
+                                <span class="author-name">Priya M.</span>
+                                <span class="author-title">User for 8 months</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial">
+                        <p class="testimonial-text">"I was skeptical about AI therapy, but Sanjeeveni's responses are thoughtful and helpful. It's like having a supportive friend who remembers everything we've talked about."</p>
+                        <div class="testimonial-author">
+                            <img src="/api/placeholder/50/50" alt="User avatar">
+                            <div class="author-info">
+                                <span class="author-name">Rahul S.</span>
+                                <span class="author-title">User for 5 months</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="pricing">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Pricing</h2>
+                    <p>Choose a plan that fits your journey.</p>
+                </div>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3>Basic</h3>
+                        <p>Free forever</p>
+                        <p><strong>$0</strong>/month</p>
+                        <ul class="pricing-features">
+                            <li>AI chat access</li>
+                            <li>Basic insights</li>
+                            <li>Community support</li>
+                        </ul>
+                        <button class="btn btn-primary">Get Started</button>
+                    </div>
+                    <div class="pricing-card recommended">
+                        <div class="badge">Most Popular</div>
+                        <h3>Pro</h3>
+                        <p>Everything in Basic plus video sessions</p>
+                        <p><strong>$19</strong>/month</p>
+                        <ul class="pricing-features">
+                            <li>Video therapy sessions</li>
+                            <li>Priority support</li>
+                            <li>Advanced AI insights</li>
+                        </ul>
+                        <button class="btn btn-primary">Sign Up</button>
+                    </div>
+                    <div class="pricing-card">
+                        <h3>Premium</h3>
+                        <p>All features plus human therapist backup</p>
+                        <p><strong>$49</strong>/month</p>
+                        <ul class="pricing-features">
+                            <li>Dedicated therapist backup</li>
+                            <li>Comprehensive analytics</li>
+                            <li>Exclusive resources</li>
+                        </ul>
+                        <button class="btn btn-primary">Join Now</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login/Signup Section -->
+        <section class="signup-section" id="auth-card">
+            <div class="container">
+                <div class="signup-container">
+                    <div class="signup-content">
+                        <h2 id="auth-title">Welcome to Sanjeeveni</h2>
+                        <p id="auth-description">Join thousands of users who have found support, guidance, and growth with Sanjeeveni's AI therapy companion.</p>
+                        <p>Our platform combines cutting-edge AI technology with evidence-based therapeutic approaches to provide you with personalized support whenever you need it.</p>
+                    </div>
+                    <div class="signup-form">
+                        <div class="auth-toggle">
+                            <button class="auth-toggle-btn active" id="loginToggle">Login</button>
+                            <button class="auth-toggle-btn" id="signupToggle">Sign Up</button>
+                        </div>
+                        
+                        <!-- Login Form -->
+                        <form id="loginForm" style="display: block;">
+                            <div class="form-group">
+                                <label for="loginEmail">Email</label>
+                                <input type="email" id="loginEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="form-submit">Login</button>
+                        </form>
+                        
+                        <!-- Signup Form -->
+                        <form id="signupForm" style="display: none;">
+                            <div class="form-row" style="display: flex; gap: 10px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="firstName">First Name</label>
+                                    <input type="text" id="firstName" required>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phoneNumber">Phone Number</label>
+                                <input type="tel" id="phoneNumber" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <input type="number" id="age" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" required>
+                            </div>
+                            <button type="submit" class="form-submit">Sign Up</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Enhanced Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-col">
+                    <h3>Sanjeeveni</h3>
+                    <p>Empowering mental wellbeing through AI-assisted therapy and support. Your journey to better mental health starts here.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16">
+                                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16">
+                                <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
+                            </svg>
+                        </a>
+                        <a href="#" aria-label="LinkedIn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16">
+                                <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#testimonials">Testimonials</a></li>
+                        <li><a href="#signup">Get Started</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#blog">Mental Health Blog</a></li>
+                        <li><a href="#guides">Self-Help Guides</a></li>
+                        <li><a href="#community">Community Support</a></li>
+                        <li><a href="#crisis">Crisis Resources</a></li>
+                        <li><a href="#professional">Find a Therapist</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Us</h3>
+                    <p>Have questions? We're here to help.</p>
+                    <ul>
+                        <li><a href="mailto:support@sanjeeveni.com">support@sanjeeveni.com</a></li>
+                        <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+                        <li><a href="#contact">Contact Form</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <div class="footer-links">
+                        <a href="#privacy">Privacy Policy</a>
+                        <a href="#terms">Terms of Service</a>
+                        <a href="#accessibility">Accessibility</a>
+                        <a href="#cookies">Cookie Policy</a>
+                    </div>
+                    <div class="copyright">
+                        <p>&copy; 2024 Sanjeeveni. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Form Validation -->
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mainNav = document.getElementById('mainNav');
+            
+            if (mobileMenuBtn && mainNav) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mainNav.classList.toggle('mobile-nav-active');
+                    this.classList.toggle('active');
+                });
+            }
+            
+            // Auth form toggle functionality
+            const loginToggle = document.getElementById('loginToggle');
+            const signupToggle = document.getElementById('signupToggle');
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const authTitle = document.getElementById('auth-title');
+            const authDescription = document.getElementById('auth-description');
+            
+            if (loginToggle && signupToggle && loginForm && signupForm) {
+                loginToggle.addEventListener('click', function() {
+                    loginToggle.classList.add('active');
+                    signupToggle.classList.remove('active');
+                    loginForm.style.display = 'block';
+                    signupForm.style.display = 'none';
+                    authTitle.textContent = 'Welcome Back';
+                    authDescription.textContent = 'Continue your healing journey with Sanjeeveni\'s AI therapy companion.';
+                });
+                
+                signupToggle.addEventListener('click', function() {
+                    signupToggle.classList.add('active');
+                    loginToggle.classList.remove('active');
+                    signupForm.style.display = 'block';
+                    loginForm.style.display = 'none';
+                    authTitle.textContent = 'Start Your Healing Journey Today';
+                    authDescription.textContent = 'Join thousands of users who have found support, guidance, and growth with Sanjeeveni\'s AI therapy companion.';
+                });
+            }
+        });
+
+        // Function to save current chat session and create a new one
+        function saveSessionAndCreateNew() {
+            // Get current chat messages from localStorage
+            const currentMessages = localStorage.getItem('chatMessages');
+            
+            if (currentMessages) {
+                // Get existing chat history or initialize new array
+                let chatHistory = localStorage.getItem('chatHistorySessions');
+                chatHistory = chatHistory ? JSON.parse(chatHistory) : [];
+                
+                // Create a new session object
+                const newSession = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    messages: JSON.parse(currentMessages)
+                };
+                
+                // Add new session to history
+                chatHistory.push(newSession);
+                
+                // Save updated history
+                localStorage.setItem('chatHistorySessions', JSON.stringify(chatHistory));
+                
+                // Clear current chat messages and create a new welcome message
+                const newChatSession = [
+                    {
+                        id: 1,
+                        text: "Hello! I'm your therapy assistant. How are you feeling today?",
+                        sender: 'bot',
+                        timestamp: new Date()
+                    }
+                ];
+                
+                // Save new session to localStorage
+                localStorage.setItem('chatMessages', JSON.stringify(newChatSession));
+            }
+        }
+
+        // Handle signup form submission
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (firstName && lastName && phoneNumber && age && email) {
+                // Save user info to localStorage
+                const userInfo = { firstName, lastName, phoneNumber, age, email };
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                
+                // Save current session and create new one
+                saveSessionAndCreateNew();
+                
+                // Redirect to chat page
+                window.location.href = 'index.html';
+            } else {
+                // Not all fields are filled, show an alert
+                alert('Please fill in all required fields before signing up.');
+            }
+        });
+        
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (email && password) {
+                // This is a prototype, so we'll just simulate login
+                // In a real app, you would validate credentials against a database
+                
+                // Save current session and create new one
+                saveSessionAndCreateNew();
+                
+                // Redirect to chat page
+                window.location.href = 'index.html';
+            } else {
+                alert('Please enter both email and password.');
+            }
+        });
+    </script>
+</body>
+</html>

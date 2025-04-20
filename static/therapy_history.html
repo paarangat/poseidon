@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Therapy Chat History</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 0.5rem;
+        }
+        .session-info {
+            background-color: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .session-info p {
+            margin: 0.5rem 0;
+            color: var(--gray-700);
+        }
+        .session-info strong {
+            color: var(--gray-900);
+        }
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .btn-secondary {
+            background-color: var(--gray-200);
+            color: var(--gray-800);
+        }
+        .btn-secondary:hover {
+            background-color: var(--gray-300);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        #chat-history-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--gray-50);
+            border-radius: 8px;
+        }
+        .message-bubble {
+            position: relative;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+        }
+        .message.user .message-bubble {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+        }
+        .message.bot .message-bubble {
+            background-color: white;
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            border-bottom-left-radius: 0;
+        }
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .message.user .message-sender {
+            color: var(--primary-dark);
+        }
+        .message.bot .message-sender {
+            color: var(--gray-700);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .loading-spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .sentiment-summary {
+            background-color: var(--blue-50);
+            border-left: 4px solid var(--blue-500);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+        .sentiment-summary h3 {
+            color: var(--blue-700);
+            margin-bottom: 0.5rem;
+        }
+        .sentiment-summary p {
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="report-container">
+        <h1>Therapy Chat History</h1>
+        
+        <div class="session-info">
+            <p><strong>Session Date:</strong> <span id="session-date">April 15, 2025</span></p>
+            <p><strong>Duration:</strong> <span id="session-duration">45 minutes</span></p>
+            <p><strong>Session Type:</strong> <span id="session-type">Cognitive Behavioral Therapy</span></p>
+        </div>
+        
+        <div class="sentiment-summary">
+            <h3>Session Summary</h3>
+            <p>This session focused on exploring work-related stress and developing coping strategies. The client expressed feelings of being overwhelmed with deadlines and workplace dynamics. Together, we identified several practical techniques for managing stress and setting healthy boundaries.</p>
+            <p>Key emotions detected: Anxiety (30%), Stress (40%), Happiness (65%)</p>
+        </div>
+        
+        <div id="chat-history-list" class="messages"></div>
+        
+        <div class="btn-container">
+            <button id="download-pdf-btn" class="btn btn-primary">Download as PDF</button>
+            <button id="download-csv-btn" class="btn btn-secondary">Download as CSV</button>
+            <button id="back-btn" class="btn btn-secondary" onclick="window.location.href='index.html'">Back to Chat</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Generating PDF...</p>
+        </div>
+    </div>
+    
+    <script>
+        // Comprehensive dummy therapy conversation
+        const dummyMessages = [
+            { sender: 'bot', text: "Hello! Welcome to our session today. How have you been feeling since we last spoke?", timestamp: '2025-04-15T10:00:00Z' },
+            { sender: 'user', text: "I've been feeling quite overwhelmed with work lately. The deadlines keep piling up, and I'm having trouble sleeping.", timestamp: '2025-04-15T10:01:30Z' },
+            { sender: 'bot', text: "I understand how challenging that can be. When you say you're having trouble sleeping, could you tell me more about that? Are you having difficulty falling asleep or staying asleep?", timestamp: '2025-04-15T10:02:45Z' },
+            { sender: 'user', text: "I keep waking up in the middle of the night thinking about all the tasks I need to complete. My mind just won't shut off.", timestamp: '2025-04-15T10:04:20Z' },
+            { sender: 'bot', text: "That sounds really difficult. Racing thoughts at night can definitely disrupt your sleep cycle. Have you tried any relaxation techniques before bed?", timestamp: '2025-04-15T10:05:40Z' },
+            { sender: 'user', text: "I've tried some breathing exercises, but they don't seem to help much. I still end up checking my phone and thinking about work.", timestamp: '2025-04-15T10:07:15Z' },
+            { sender: 'bot', text: "It's good that you've tried breathing exercises. Let's build on that. Creating a digital boundary before bed might help too. What would you think about trying a 30-minute screen-free wind-down period before sleep?", timestamp: '2025-04-15T10:09:00Z' },
+            { sender: 'user', text: "That sounds reasonable. I could try reading a book instead of checking emails. But I'm still worried about all the deadlines I have coming up.", timestamp: '2025-04-15T10:10:45Z' },
+            { sender: 'bot', text: "Reading is an excellent alternative. Regarding your deadlines, sometimes organizing our thoughts can help reduce the mental load. Would it be helpful to spend 10 minutes before your wind-down time to write a prioritized to-do list for the next day?", timestamp: '2025-04-15T10:12:30Z' },
+            { sender: 'user', text: "Yes, that might help. I think part of my anxiety comes from feeling like I might forget something important.", timestamp: '2025-04-15T10:14:00Z' },
+            { sender: 'bot', text: "That's a very common feeling. Externalizing those thoughts onto paper can give your mind permission to rest. Let's make a simple plan: 10 minutes for a to-do list, followed by 30 minutes of screen-free time with reading, then your breathing exercises. How does that sound?", timestamp: '2025-04-15T10:15:45Z' },
+            { sender: 'user', text: "I think I can manage that. I'll give it a try tonight.", timestamp: '2025-04-15T10:17:10Z' },
+            { sender: 'bot', text: "That's great! Remember, it might take a few nights to see improvement, so try to be patient with yourself. Would you like to discuss any specific work stressors that are contributing to your overwhelm?", timestamp: '2025-04-15T10:18:30Z' },
+            { sender: 'user', text: "My manager keeps adding more to my plate without removing anything. I don't know how to say no without looking incapable.", timestamp: '2025-04-15T10:20:15Z' },
+            { sender: 'bot', text: "That's a challenging situation that many people face. Setting boundaries at work takes practice. Instead of a simple 'no,' you might try acknowledging the request and offering alternatives, like 'I'd be happy to take this on, but I'd need guidance on which of my current projects should be deprioritized.' How does that approach feel to you?", timestamp: '2025-04-15T10:22:00Z' },
+            { sender: 'user', text: "That sounds better than just saying no. I'll try to be more assertive about my workload.", timestamp: '2025-04-15T10:23:45Z' },
+            { sender: 'bot', text: "That's a positive step forward. Remember, being clear about your capacity isn't showing incapability—it's actually demonstrating professionalism and good project management. Would it help to role-play some of these conversations?", timestamp: '2025-04-15T10:25:30Z' }
+        ];
+
+        // Format date for display
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Render chat history
+        function renderChatHistory() {
+            const container = document.getElementById('chat-history-list');
+            container.innerHTML = '';
+            
+            // Try to get selected session from localStorage
+            const selectedSession = localStorage.getItem('selectedSession');
+            
+            // If no selected session, try to get data from localStorage or use dummy data
+            let messages;
+            if (selectedSession) {
+                const session = JSON.parse(selectedSession);
+                messages = session.messages;
+                
+                // Update session info
+                document.getElementById('session-date').textContent = formatDate(new Date(session.timestamp));
+                
+                // Extract session duration (approximate based on first and last message)
+                if (messages.length > 1) {
+                    const firstMsg = messages[0];
+                    const lastMsg = messages[messages.length - 1];
+                    const startTime = new Date(firstMsg.timestamp);
+                    const endTime = new Date(lastMsg.timestamp);
+                    const durationMinutes = Math.round((endTime - startTime) / (1000 * 60));
+                    document.getElementById('session-duration').textContent = `${durationMinutes} minutes`;
+                }
+            } else {
+                // Fallback to current chat or dummy data
+                const stored = localStorage.getItem('chatMessages');
+                messages = stored ? JSON.parse(stored) : dummyMessages;
+            }
+            
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.sender}`;
+                div.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="message-sender">${msg.sender === 'user' ? 'You' : 'Therapist'}</div>
+                        <div class="message-content">${msg.text}</div>
+                        <div class="message-time">${formatDate(new Date(msg.timestamp))}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Generate and download PDF
+        function generatePDF() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            const element = document.getElementById('report-container');
+            const options = {
+                margin: 10,
+                filename: 'therapy_session_report.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Use html2canvas and jsPDF
+            html2canvas(element, {scale: 2}).then(canvas => {
+                loading.style.display = 'none';
+                
+                // Convert the canvas to a data URL
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Initialize jsPDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Calculate dimensions
+                const imgWidth = 210; // A4 width in mm
+                const pageHeight = 295; // A4 height in mm
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                // Add first page
+                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                // Add additional pages if needed
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Save the PDF
+                pdf.save('therapy_session_report.pdf');
+            });
+        }
+
+        // Generate and download CSV
+        function generateCSV() {
+            // Get selected session or current chat
+            const selectedSession = localStorage.getItem('selectedSession');
+            let messages;
+            
+            if (selectedSession) {
+                const session = JSON.parse(selectedSession);
+                messages = session.messages;
+            } else {
+                const stored = localStorage.getItem('chatMessages');
+                messages = stored ? JSON.parse(stored) : dummyMessages;
+            }
+            
+            const headers = ['Sender', 'Message', 'Timestamp'];
+            let csvContent = headers.join(',') + '\n';
+            
+            messages.forEach(msg => {
+                const sender = msg.sender === 'user' ? 'You' : 'Therapist';
+                // Escape quotes and commas in the text
+                const text = `"${msg.text.replace(/"/g, '""')}"`;
+                const timestamp = formatDate(new Date(msg.timestamp));
+                
+                csvContent += `${sender},${text},"${timestamp}"\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'therapy_session_history.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Render the chat history
+            renderChatHistory();
+            
+            // Set up event listeners
+            document.getElementById('download-pdf-btn').addEventListener('click', generatePDF);
+            document.getElementById('download-csv-btn').addEventListener('click', generateCSV);
+            document.getElementById('back-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+            
+            // Auto-trigger download if #download in URL
+            if (window.location.hash === '#download') {
+                setTimeout(() => {
+                    generateCSV();
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>

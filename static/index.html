@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sanjeeveni - Therapy Chatbot</title>
+  <!-- Link to your CSS file -->
+  <link rel="stylesheet" href="index.css">
+  <!-- Google Font (optional) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Skip to chat content for accessibility -->
+  <a href="#chatContainer" class="skip-to-main">Skip to chat</a>
+  <header>
+    <div class="container nav-flex">
+      <a href="#" class="logo">Sanjeeveni</a>
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <nav class="main-nav" id="mainNav">
+        <ul class="nav-links">
+          <li><a href="#historySidebar">History</a></li>
+          <li><a href="#chatContainer">Chat</a></li>
+          <li><a href="#analysisSidebar">Analysis</a></li>
+        </ul>
+      </nav>
+      <div class="auth-buttons">
+        <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Left sidebar - Therapy History -->
+    <div class="sidebar history-sidebar" id="historySidebar">
+      <div class="card">
+        <h3 class="section-title">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"></path>
+            <path d="M19 3v18"></path>
+            <path d="M8 17l4-8 4 8"></path>
+          </svg>
+          Therapy History
+        </h3>
+        
+        <div class="sessions-list">
+          <div class="session-item">
+            <div class="session-header">
+              <h4 class="session-date" id="session-date-1"></h4>
+              <span class="session-badge">Session #1</span>
+            </div>
+            <p class="session-summary">Initial assessment session</p>
+            <div class="session-actions">
+              <button class="action-btn primary" onclick="window.location.href='therapy_history.html'">View Details</button>
+              <button class="action-btn secondary" onclick="window.location.href='therapy_history.html#download'">Download Report</button>
+            </div>
+          </div>
+          
+          <div class="session-item">
+            <div class="session-header">
+              <h4 class="session-date" id="session-date-2"></h4>
+              <span class="session-badge">Session #2</span>
+            </div>
+            <p class="session-summary">Discussed work-related stress</p>
+            <div class="session-actions">
+              <button class="action-btn primary" onclick="window.location.href='therapy_history.html'">View Details</button>
+              <button class="action-btn secondary" onclick="window.location.href='therapy_history.html#download'">Download Report</button>
+            </div>
+          </div>
+          
+          <div class="session-item current">
+            <div class="session-header">
+              <h4 class="session-date" id="session-date-3"></h4>
+              <span class="session-badge current">Current Session</span>
+            </div>
+            <p class="session-summary">Session in progress...</p>
+          </div>
+        </div>
+        
+        <div class="upcoming-sessions">
+          <h4 class="subsection-title">Upcoming Sessions</h4>
+          <div class="empty-state">
+            <p>No upcoming sessions scheduled</p>
+            <button class="schedule-btn">Schedule a Session</button>
+          </div>
+        </div>
+        
+        <div class="progress-overview">
+          <h4 class="subsection-title">Progress Overview</h4>
+          <div class="progress-stats">
+            <div class="stat-item">
+              <p class="stat-label">Sessions completed</p>
+              <p class="stat-value">2</p>
+            </div>
+            <div class="stat-item">
+              <p class="stat-label">Progress</p>
+              <div class="progress-container">
+                <div class="progress-bar" style="width: 35%"></div>
+              </div>
+              <span class="progress-value">35%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main chat area (Responsive Chatbot) -->
+    <div class="chat-container" id="chatContainer">
+      <div class="messages" id="messagesContainer">
+        <!-- Messages will be dynamically added here by script.js -->
+      </div>
+      
+      <div class="message-input">
+        <form id="messageForm">
+          <input 
+            type="text" 
+            id="messageInput" 
+            placeholder="Type your message here..."
+            autocomplete="off"
+          >
+          <button type="submit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Right sidebar - Analysis -->
+    <div class="sidebar analysis-sidebar" id="analysisSidebar">
+      <div class="card">
+        <h3 class="section-title">
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+            <path d="M8 15v-6"></path>
+            <path d="M12 15v-3"></path>
+            <path d="M16 15V9"></path>
+          </svg>
+          Mental Health Analysis
+        </h3>
+        
+        <!-- Add chart canvas for visualization -->
+        <div class="chart-container" style="position: relative; height:220px; margin-bottom: 1.5rem;">
+          <canvas id="mentalHealthChart"></canvas>
+        </div>
+        
+        <div class="analysis-metrics">
+          <div class="metric">
+            <div class="metric-header">
+              <div class="metric-label">
+                <svg class="metric-icon depression" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 15h8"></path>
+                  <path d="M9 9h.01"></path>
+                  <path d="M15 9h.01"></path>
+                </svg>
+                <span>Depression</span>
+              </div>
+              <span class="metric-value" id="depressionValue">25%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar depression" id="depressionBar" style="width: 25%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <div class="metric-label">
+                <svg class="metric-icon anxiety" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                <span>Anxiety</span>
+              </div>
+              <span class="metric-value" id="anxietyValue">30%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar anxiety" id="anxietyBar" style="width: 30%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <div class="metric-label">
+                <svg class="metric-icon happiness" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <path d="M9 9h.01"></path>
+                  <path d="M15 9h.01"></path>
+                </svg>
+                <span>Happiness</span>
+              </div>
+              <span class="metric-value" id="happinessValue">65%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar happiness" id="happinessBar" style="width: 65%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <div class="metric-label">
+                <svg class="metric-icon suicidal" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                  <path d="M12 9v4"></path>
+                  <path d="M12 17h.01"></path>
+                </svg>
+                <span>Suicidal Tendencies</span>
+              </div>
+              <span class="metric-value" id="suicidalValue">5%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar suicidal" id="suicidalBar" style="width: 5%"></div>
+            </div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-header">
+              <div class="metric-label">
+                <svg class="metric-icon stress" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.2 8.4c.5.38.8.97.8 1.6 0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2 0-.63.3-1.22.8-1.6"></path>
+                  <path d="m21.2 15.6c.5-.38.8-.97.8-1.6 0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2 0 .63.3 1.22.8 1.6"></path>
+                  <path d="M3 3v18"></path>
+                  <path d="M21 3v18"></path>
+                </svg>
+                <span>Stress</span>
+              </div>
+              <span class="metric-value" id="stressValue">40%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar stress" id="stressBar" style="width: 40%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="analysis-summary">
+          <h4 class="subsection-title">Summary</h4>
+          <p>
+            Based on your conversation, you appear to be experiencing moderate levels of stress and anxiety,
+            with some signs of depression. Your happiness indicators are relatively positive, which is a good sign.
+            Continue to monitor your mental health and consider the recommendations below.
+          </p>
+          
+          <div class="recommendations" id="recommendationsContainer">
+            <h4>Recommendations:</h4>
+            <ul>
+              <li>Try practicing mindfulness and deep breathing exercises to help manage anxiety.</li>
+              <li>Regular physical activity and adequate sleep can help reduce stress levels.</li>
+              <li>Continue practicing self-care and maintaining your mental well-being.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="nav-tab" data-tab="history">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3v18h18"></path>
+        <path d="M19 3v18"></path>
+        <path d="M8 17l4-8 4 8"></path>
+      </svg>
+    </button>
+    <button class="nav-tab active" data-tab="chat">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3
+                 c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5
+                 c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+      </svg>
+    </button>
+    <button class="nav-tab" data-tab="analysis">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+           viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+        <path d="M8 15v-6"></path>
+        <path d="M12 15v-3"></path>
+        <path d="M16 15V9"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Define API URL and include the main JavaScript file -->
+  <script>
+    // This is now handled directly in index.js
+    // const API_URL = '/chat'; 
+  </script>
+  <script src="index.js"></script>
+</body>
+</html>
