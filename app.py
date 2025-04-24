@@ -323,4 +323,4 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     # Set host to '0.0.0.0' to make it accessible on the network if needed
     # Use debug=False in production
-    app.run(host='0.0.0.0', port=port, debug=True) 
+    app.run(host='0.0.0.0', port=port, debug=False)
