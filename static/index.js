@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const recommendationsContainer = document.getElementById('recommendationsContainer');
   
   // API endpoint
-  const API_URL = 'http://localhost:5000/chat';
+  const API_URL = '/chat';  // Using relative URL which works both locally and when deployed
   
   // Load chat history from localStorage if available
   let messages;
